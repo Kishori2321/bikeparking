@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
+
+contract BikeParkingAllotment {
+    address public owner;
+    mapping(address => uint256) public bikeSlotMapping;
+
+    event BikeAllotted(address indexed bikeOwner, uint256 allottedSlot);
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function allotBikeParking(uint256 requestedSlot) external {
+        // Assert to ensure the requested slot is within the valid range (10 to 50)
+        assert(requestedSlot >= 10 && requestedSlot <= 50);
+
+    
+        // Handling a special case: Slot 31 gets a special prize
+        if (requestedSlot == 31) {
+            revert("Thirty first slot is reserved for VIP");
+        }
+          require(bikeSlotMapping[msg.sender] == 0, "This slot is not empty please book a different slot");
+        
+        bikeSlotMapping[msg.sender] = requestedSlot;
+
+        // Emit an event to indicate successful allotment
+        emit BikeAllotted(msg.sender, requestedSlot);
+    }
+
+    function getBikeSlot(address bikeOwner) external view returns (uint256) {
+        return bikeSlotMapping[bikeOwner];
+    }
+}
